@@ -1,39 +1,39 @@
 import React from 'react';
 import Link from 'next/link';
 import { SITE_METADATA } from '@/lib/constants';
-import { Mail, ExternalLink, Globe } from 'lucide-react';
+import { Mail, ExternalLink } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#071B2F] text-white border-t border-slate-800 pt-16 pb-12">
+    <footer className="bg-[#0B0C10] text-white border-t border-white/10 pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 pb-16 border-b border-white/10">
           {/* Column 1: Brand & Identity */}
           <div className="space-y-4 md:col-span-1">
-            <div className="flex items-center gap-2 text-xl font-black tracking-tight text-white">
-              <div className="w-8 h-8 rounded-lg bg-[#037EF3] flex items-center justify-center font-extrabold text-white text-sm">
+            <div className="flex items-center gap-2.5 text-xl font-black tracking-tight text-white">
+              <div className="w-8 h-8 rounded-full bg-[#037EF3] flex items-center justify-center font-black text-white text-xs">
                 GV
               </div>
               <span className="font-extrabold text-lg">
-                AIESEC <span className="text-[#037EF3]">in Bhopal</span>
+                AIESEC <span className="text-[#037EF3]">Bhopal</span>
               </span>
             </div>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              AIESEC is the world&apos;s largest youth-led organization developing leadership potential through international cross-cultural exchanges and volunteer projects.
+            <p className="text-xs text-slate-300 leading-relaxed font-normal">
+              Developing leadership potential through international cross-cultural volunteer exchanges and community projects.
             </p>
-            <div className="inline-block px-3 py-1 bg-slate-800 rounded-md text-[11px] text-amber-400 font-mono">
+            <div className="inline-block px-3 py-1 bg-white/10 border border-white/15 rounded-full text-[10px] text-[#FFC857] font-mono">
               [TEMP_PLACEHOLDER] Local Chapter Site
             </div>
           </div>
 
           {/* Column 2: Navigation Links */}
           <div className="space-y-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-[#FFC857]">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#FFC857]">
               Explore
             </h3>
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2.5 text-xs text-slate-300">
               <li>
                 <a href="#why-bhopal" className="hover:text-white transition-colors">
                   Why Bhopal
@@ -64,10 +64,10 @@ export const Footer: React.FC = () => {
 
           {/* Column 3: Official Handoff Links */}
           <div className="space-y-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-[#FFC857]">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#FFC857]">
               Official Portals
             </h3>
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2.5 text-xs text-slate-300">
               <li>
                 <a
                   href={SITE_METADATA.officialGVUrl}
@@ -100,10 +100,10 @@ export const Footer: React.FC = () => {
 
           {/* Column 4: Contact & Socials */}
           <div className="space-y-4">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-[#FFC857]">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-[#FFC857]">
               Connect With Us
             </h3>
-            <div className="flex items-center gap-2 text-sm text-slate-300">
+            <div className="flex items-center gap-2 text-xs text-slate-300">
               <Mail className="w-4 h-4 text-[#037EF3] shrink-0" />
               <a
                 href={`mailto:${SITE_METADATA.contactEmail}`}
@@ -117,7 +117,7 @@ export const Footer: React.FC = () => {
                 href={SITE_METADATA.socials.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-[#037EF3] flex items-center justify-center text-slate-300 hover:text-white transition-all min-h-[44px] min-w-[44px]"
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#037EF3] flex items-center justify-center text-slate-300 hover:text-white transition-all min-h-[44px] min-w-[44px]"
                 aria-label="AIESEC in Bhopal Instagram"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -128,7 +128,7 @@ export const Footer: React.FC = () => {
                 href={SITE_METADATA.socials.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-[#037EF3] flex items-center justify-center text-slate-300 hover:text-white transition-all min-h-[44px] min-w-[44px]"
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#037EF3] flex items-center justify-center text-slate-300 hover:text-white transition-all min-h-[44px] min-w-[44px]"
                 aria-label="AIESEC in Bhopal LinkedIn"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@ export const Footer: React.FC = () => {
                 href={SITE_METADATA.socials.youtube}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-[#037EF3] flex items-center justify-center text-slate-300 hover:text-white transition-all min-h-[44px] min-w-[44px]"
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-[#037EF3] flex items-center justify-center text-slate-300 hover:text-white transition-all min-h-[44px] min-w-[44px]"
                 aria-label="AIESEC Global YouTube"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
