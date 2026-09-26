@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Provisional / Temp Brand Color Palette (Clearly marked until official assets provided) */
+  --color-aiesec-blue: #037EF3;
+  --color-aiesec-navy: #071B2F;
+  --color-aiesec-offwhite: #F7F5F0;
+  --color-aiesec-green: #2E9E6F;
+  --color-aiesec-yellow: #FFC857;
+  --color-aiesec-coral: #FF6B5E;
+  --color-aiesec-muted: #5B6573;
+  --color-aiesec-border: #E5E7EB;
+
+  --background: #FFFFFF;
+  --foreground: #071B2F;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-aiesec-blue: var(--color-aiesec-blue);
+  --color-aiesec-navy: var(--color-aiesec-navy);
+  --color-aiesec-offwhite: var(--color-aiesec-offwhite);
+  --color-aiesec-green: var(--color-aiesec-green);
+  --color-aiesec-yellow: var(--color-aiesec-yellow);
+  --color-aiesec-coral: var(--color-aiesec-coral);
+  --color-aiesec-muted: var(--color-aiesec-muted);
+  --color-aiesec-border: var(--color-aiesec-border);
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
 }
+
+/* Accessible focus ring style */
+*:focus-visible {
+  outline: 3px solid #037EF3;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F5F0;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
