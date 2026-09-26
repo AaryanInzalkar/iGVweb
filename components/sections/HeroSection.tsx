@@ -1,35 +1,52 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/Button';
 import { ArrowDown } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
   return (
-    <section className="relative bg-[#000000] text-white min-h-[90vh] flex flex-col items-center justify-center overflow-hidden select-none py-20">
-      {/* Soft atmospheric ambient lighting */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[1000px] h-[600px] bg-radial from-slate-400/10 via-slate-800/5 to-transparent rounded-full blur-[180px] pointer-events-none" />
+    <section className="relative bg-[#000000] text-white min-h-screen flex flex-col items-center justify-center overflow-hidden select-none">
+      {/* Cinematic atmospheric floor reflection */}
+      <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-slate-900/20 via-transparent to-transparent pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col items-center justify-center space-y-16">
+      {/* Subtle spotlight from above */}
+      <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-radial from-white/8 to-transparent rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative z-10 text-center flex flex-col items-center justify-center w-full px-4">
         
-        {/* CONTINUOUS 3D CAMERA ANGLE Orbit CONTAINER */}
-        <div className="camera-3d-orbit py-8 px-4">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none font-sans metallic-silver-text metallic-3d-shadow">
-            AIESEC in Bhopal
-          </h1>
+        {/* 3D CINEMATIC PAN CONTAINER */}
+        <div className="cinematic-pan-3d">
+          {/* 
+            Two layers stacked:
+            1. Bottom layer = 3D extruded depth (visible shadows) 
+            2. Top layer = chrome metallic surface (clip-gradient)
+          */}
+          <div className="relative">
+            {/* Shadow/Depth Layer — provides the 3D extrusion geometry */}
+            <h1
+              aria-hidden="true"
+              className="text-3d-extruded text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] xl:text-[13rem] font-black tracking-tighter leading-[0.88] whitespace-nowrap"
+            >
+              AIESEC in Bhopal
+            </h1>
+
+            {/* Surface Layer — chrome metallic gradient on top */}
+            <h1
+              className="text-metallic-surface text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] xl:text-[13rem] font-black tracking-tighter leading-[0.88] whitespace-nowrap absolute inset-0"
+            >
+              AIESEC in Bhopal
+            </h1>
+          </div>
         </div>
 
-        {/* Minimal Scroll CTA */}
-        <div className="pt-8">
-          <a href="#why-bhopal" className="focus-visible:outline-none">
-            <Button
-              variant="dark"
-              size="lg"
-              className="rounded-full px-8 py-4 font-bold text-sm bg-white/10 text-slate-200 border-white/20 hover:bg-white/20 hover:text-white backdrop-blur-xl transition-all duration-300 gap-2 shadow-2xl"
-            >
-              <span>Explore</span>
-              <ArrowDown className="w-4 h-4 animate-bounce" />
-            </Button>
+        {/* Minimal scroll indicator */}
+        <div className="mt-20 md:mt-28">
+          <a
+            href="#why-bhopal"
+            className="group inline-flex flex-col items-center gap-2 text-slate-500 hover:text-white transition-colors duration-300 focus-visible:outline-none"
+          >
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Scroll</span>
+            <ArrowDown className="w-4 h-4 animate-bounce" />
           </a>
         </div>
 
