@@ -117,22 +117,46 @@ body {
   100% { background-position: 100% 50%; }
 }
 
-/* CINEMATIC LEFT-TO-RIGHT SLOW PAN */
+/* CINEMATIC INTRO REVEAL + FLOATING BREATH */
 .cinematic-pan-3d {
   transform-style: preserve-3d;
-  will-change: transform;
-  animation: cinematicPan 14s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform, opacity;
+  animation:
+    cinematicReveal 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    cinematicFloat 10s ease-in-out 2.4s infinite;
+  opacity: 0;
 }
 
-@keyframes cinematicPan {
+/* Dramatic intro — scales up from deep, fades in */
+@keyframes cinematicReveal {
   0% {
-    transform: perspective(1000px) rotateY(-25deg) rotateX(3deg) translateX(-4%);
-  }
-  50% {
-    transform: perspective(1000px) rotateY(25deg) rotateX(-3deg) translateX(4%);
+    opacity: 0;
+    transform: perspective(1200px) rotateX(8deg) scale(0.88) translateY(30px);
+    filter: blur(8px);
   }
   100% {
-    transform: perspective(1000px) rotateY(-25deg) rotateX(3deg) translateX(-4%);
+    opacity: 1;
+    transform: perspective(1200px) rotateX(0deg) scale(1) translateY(0px);
+    filter: blur(0px);
+  }
+}
+
+/* Subtle weightless float — barely perceptible, keeps it alive */
+@keyframes cinematicFloat {
+  0% {
+    transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1);
+  }
+  25% {
+    transform: perspective(1200px) rotateX(-1.2deg) rotateY(2deg) translateY(-6px) scale(1.005);
+  }
+  50% {
+    transform: perspective(1200px) rotateX(0.8deg) rotateY(-1.5deg) translateY(2px) scale(0.998);
+  }
+  75% {
+    transform: perspective(1200px) rotateX(-0.6deg) rotateY(1deg) translateY(-4px) scale(1.003);
+  }
+  100% {
+    transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1);
   }
 }
 
