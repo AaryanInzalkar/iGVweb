@@ -3,7 +3,7 @@ import { MapPin, Waves, GraduationCap, Utensils, HeartHandshake } from 'lucide-r
 
 export const WhyBhopalSection: React.FC = () => {
   return (
-    <section id="why-bhopal" className="py-24 md:py-36 bg-[#F9F8F6] text-[#0B0C10]">
+    <section id="why-bhopal" className="pt-32 md:pt-44 pb-24 md:pb-36 bg-[#F9F8F6] text-[#0B0C10]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           {/* Left Column: Squarespace Imagery */}
