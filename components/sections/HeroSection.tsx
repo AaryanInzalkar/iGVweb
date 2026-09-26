@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/Button';
 import { SITE_METADATA } from '@/lib/constants';
-import { ExternalLink, ArrowUpRight, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 export const HeroSection: React.FC = () => {
   const handleApplyClick = () => {
@@ -13,114 +12,147 @@ export const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative bg-[#0B0C10] text-white pt-12 pb-24 md:pt-20 md:pb-36 overflow-hidden">
-      {/* Luxury ambient light orbs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[550px] bg-radial from-[#037EF3]/20 via-[#037EF3]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-[#FFC857]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-10 left-10 w-[350px] h-[350px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative min-h-screen bg-[#080808] text-white flex flex-col justify-between overflow-hidden">
+      {/* Background Photography with Warm Bronze Organic Tone */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-85"
+        style={{
+          backgroundImage: "url('/images/squarespace_hero_bg.jpg')",
+        }}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center max-w-4xl mx-auto space-y-8">
-          {/* Top Pill Tag */}
-          <div className="hero-reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-slate-200 text-xs font-extrabold uppercase tracking-widest backdrop-blur-md shadow-lg">
-            <Sparkles className="w-3.5 h-3.5 text-[#FFC857]" />
-            <span>AIESEC in Bhopal • Incoming Global Volunteer</span>
-          </div>
+      {/* Atmospheric Vignette & Gradients to guarantee high-contrast legibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/90 pointer-events-none" />
+      <div className="absolute inset-0 bg-radial from-transparent via-black/30 to-black/80 pointer-events-none" />
 
-          {/* Editorial Display Headline */}
-          <div className="hero-reveal hero-reveal-delay-1 space-y-2">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[1.02]">
-              AIESEC in Bhopal.{' '}
-              <span className="bg-gradient-to-r from-[#037EF3] via-sky-400 to-[#FFC857] bg-clip-text text-transparent block sm:inline">
-                Lead the Change.
-              </span>
-            </h1>
-          </div>
+      {/* Center Hero Typography & Primary CTA */}
+      <div className="relative z-10 pt-36 sm:pt-44 md:pt-48 pb-12 sm:pb-16 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[6.75rem] xl:text-[7.5rem] font-medium tracking-tight text-white leading-[1.03] select-none">
+          AIESEC in Bhopal
+          <br />
+          makes it real
+        </h1>
 
-          {/* Subtitle */}
-          <p className="hero-reveal hero-reveal-delay-2 text-lg sm:text-xl text-slate-300 font-normal max-w-2xl mx-auto leading-relaxed">
-            Welcome to AIESEC in Bhopal&apos;s Incoming Global Volunteer platform. Develop cross-cultural leadership skills while driving real social impact in the heart of India&apos;s City of Lakes.
+        {/* Crisp White CTA Button & Microcopy */}
+        <div className="mt-8 sm:mt-10 flex flex-col items-center gap-3">
+          <a
+            href={SITE_METADATA.defaultApplyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleApplyClick}
+          >
+            <button className="bg-white hover:bg-neutral-200 text-black text-xs sm:text-sm font-bold uppercase tracking-[0.2em] px-10 py-4 rounded-none transition-all duration-200 shadow-2xl hover:scale-[1.02] active:scale-[0.98]">
+              GET STARTED
+            </button>
+          </a>
+          <p className="text-[11px] sm:text-xs text-neutral-400 font-normal tracking-wide">
+            Start for free. No credit card required.
           </p>
-
-          {/* Action CTAs */}
-          <div className="hero-reveal hero-reveal-delay-3 flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <a
-              href={SITE_METADATA.defaultApplyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleApplyClick}
-            >
-              <Button variant="primary" size="lg" className="shadow-2xl shadow-[#037EF3]/40 hover:shadow-[#037EF3]/60 transition-all">
-                <span>Explore Bhopal Opportunities</span>
-                <ArrowUpRight className="w-5 h-5 ml-1" />
-              </Button>
-            </a>
-
-            <a
-              href={SITE_METADATA.officialGVUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="dark" size="lg" className="border-white/20 hover:border-white/40">
-                <span>About Global Volunteer</span>
-              </Button>
-            </a>
-          </div>
-
-          {/* AIESEC Bhopal Trust Metrics Bar */}
-          <div className="hero-reveal hero-reveal-delay-4 pt-8 grid grid-cols-3 max-w-xl mx-auto border-t border-white/10 text-xs text-slate-300">
-            <div className="space-y-0.5">
-              <div className="font-black text-2xl md:text-3xl text-white">500+</div>
-              <div className="text-[11px] text-slate-400 font-medium">Volunteers Hosted</div>
-            </div>
-            <div className="space-y-0.5 border-x border-white/10 px-2">
-              <div className="font-black text-2xl md:text-3xl text-[#FFC857]">10+ Yrs</div>
-              <div className="text-[11px] text-slate-400 font-medium">Exchange Excellence</div>
-            </div>
-            <div className="space-y-0.5">
-              <div className="font-black text-2xl md:text-3xl text-[#2E9E6F]">17 SDGs</div>
-              <div className="text-[11px] text-slate-400 font-medium">Global Impact Driven</div>
-            </div>
-          </div>
         </div>
+      </div>
 
-        {/* Hero Visual Showcase Panel */}
-        <div className="hero-reveal hero-reveal-delay-4 mt-14 md:mt-20 relative max-w-5xl mx-auto">
-          <div className="relative rounded-[32px] overflow-hidden border border-white/15 bg-[#14161D] shadow-2xl group">
-            <img
-              src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1200"
-              alt="Global volunteer teaching children in Bhopal community classroom"
-              className="w-full h-[400px] md:h-[520px] object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0C10] via-black/20 to-transparent" />
+      {/* Bottom Triptych Showcase Cards Peeking from Below the Fold */}
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mb-12 sm:-mb-16 md:-mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8 items-end">
+          
+          {/* Card 1 (Left): Dark Brutalist Typography Card — Green Bhopal Initiative */}
+          <Link
+            href="/projects/green-bhopal-initiative"
+            className="group block bg-[#0F1117] text-white p-6 sm:p-8 rounded-t-2xl sm:rounded-t-3xl border border-white/10 shadow-2xl hover:-translate-y-2 transition-transform duration-300"
+          >
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400 mb-6">
+              <span>WORK</span>
+              <span>ABOUT</span>
+              <span>SDG #13</span>
+            </div>
 
-            {/* Squarespace Luxury Glassmorphic Overlay Card */}
-            <div className="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 md:right-8 glass-panel-dark p-6 rounded-2xl border border-white/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#037EF3] text-white text-[10px] font-black uppercase tracking-wider">
-                  AIESEC in Bhopal • Spotlight Opportunity
-                </div>
-                <h2 className="font-extrabold text-lg md:text-xl text-white">
-                  Global Classroom 2026 • Bhopal, India
-                </h2>
-                <p className="text-xs text-slate-300">
-                  SDG #4 Quality Education • 6-Week Cross-Cultural Leadership Internship
+            <div className="space-y-4">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-none group-hover:text-emerald-400 transition-colors">
+                GREEN
+                <br />
+                BHOPAL
+              </h2>
+              <div className="pt-4 border-t border-white/10 text-xs text-neutral-400 space-y-1">
+                <p className="font-bold text-white uppercase tracking-wider text-[11px]">Bhopal / Upper Lake</p>
+                <p className="text-[11px] leading-relaxed text-neutral-400">
+                  Urban lake conservation, biodiversity drives, and climate awareness in Central India.
                 </p>
               </div>
-
-              <a
-                href={SITE_METADATA.defaultApplyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0"
-              >
-                <Button variant="pill" size="sm" className="text-xs font-black">
-                  <span>Apply Now</span>
-                  <ExternalLink className="w-3.5 h-3.5 ml-1" />
-                </Button>
-              </a>
             </div>
-          </div>
+
+            <div className="mt-8 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-300 group-hover:text-white">
+              <span>VIEW PROJECT</span>
+              <span>01 →</span>
+            </div>
+          </Link>
+
+          {/* Card 2 (Center - Prominent): Cream Luxury Editorial Card — Global Classroom 2026 */}
+          <Link
+            href="/projects/global-classroom-2026"
+            className="group block bg-[#F5F2EB] text-black p-6 sm:p-8 rounded-t-2xl sm:rounded-t-3xl border border-neutral-300 shadow-2xl md:-translate-y-6 hover:md:-translate-y-8 transition-transform duration-300"
+          >
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-600 mb-4">
+              <span>EXPLORE</span>
+              <span className="font-extrabold text-black">AIESEC IN BHOPAL</span>
+              <span>APPLY (OPEN)</span>
+            </div>
+
+            <div className="text-center py-2">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal uppercase tracking-wider text-neutral-900 group-hover:opacity-80 transition-opacity">
+                CLASSROOM
+              </h2>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-neutral-500 mt-1 font-sans font-semibold">
+                SDG #4 Quality Education
+              </p>
+            </div>
+
+            <div className="relative mt-4 mb-4 rounded-xl overflow-hidden aspect-[16/10] bg-neutral-200">
+              <img
+                src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800"
+                alt="Global volunteer teaching children in Bhopal"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-semibold text-neutral-700 pt-2 border-t border-neutral-300">
+              <span>6-Week Leadership Exchange</span>
+              <span className="font-bold text-black uppercase tracking-wider">VIEW PROJECT 02 →</span>
+            </div>
+          </Link>
+
+          {/* Card 3 (Right): Off-White Minimalist Card — Health & Hygiene Awareness */}
+          <Link
+            href="/projects/health-hygiene-awareness"
+            className="group block bg-[#E8E8E8] text-black p-6 sm:p-8 rounded-t-2xl sm:rounded-t-3xl border border-neutral-300 shadow-2xl hover:-translate-y-2 transition-transform duration-300"
+          >
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-600 mb-4">
+              <span>COMMUNITY / CARE</span>
+              <span>SDG #3</span>
+            </div>
+
+            <div className="relative rounded-xl overflow-hidden aspect-[16/10] bg-neutral-300 mb-4">
+              <img
+                src="https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=800"
+                alt="Health awareness and hygiene campaign in Bhopal"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight uppercase leading-tight text-neutral-900 group-hover:text-blue-600 transition-colors">
+                COMMUNITY HEALTH
+              </h2>
+              <p className="text-[11px] text-neutral-600 leading-relaxed">
+                Preventive healthcare, sanitation drives, and nutrition workshops across Bhopal communities.
+              </p>
+            </div>
+
+            <div className="mt-6 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-800">
+              <span>EXPLORE</span>
+              <span>03 →</span>
+            </div>
+          </Link>
+
         </div>
       </div>
     </section>
