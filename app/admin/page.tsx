@@ -2,32 +2,31 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { Project, ProjectStatus, ProjectFormData } from '@/types/project';
-import { MOCK_PROJECTS } from '@/lib/mock-data';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { SDGBadge } from '@/components/ui/SDGBadge';
 import { Button } from '@/components/ui/Button';
 import { formatDate, slugify, isValidHttpsUrl } from '@/lib/utils';
 import {
-  ShieldCheck,
   Plus,
   Search,
   Filter,
   Edit2,
   Trash2,
-  CheckCircle,
-  XCircle,
   LogOut,
-  FolderOpen,
-  Calendar,
   ExternalLink,
   Save,
   X,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
-  const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [isEditing, setIsEditing] = useState(false);
@@ -53,6 +52,26 @@ export default function AdminDashboardPage() {
     image_alt_text: '',
     status: 'draft',
   });
+
+  // Fetch real project data from the database on mount
+  async function refreshProjects() {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const res = await fetch('/api/admin/projects');
+      if (!res.ok) throw new Error(`Failed to load projects (${res.status})`);
+      const data: Project[] = await res.json();
+      setProjects(data);
+    } catch (e: any) {
+      setLoadError(e.message || 'Failed to load projects.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    refreshProjects();
+  }, []);
 
   const handleOpenNew = () => {
     setCurrentProject(null);
@@ -109,7 +128,7 @@ export default function AdminDashboardPage() {
     }));
   };
 
-  const handleSaveForm = (e: React.FormEvent) => {
+  const handleSaveForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
 
@@ -139,40 +158,65 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    if (currentProject) {
-      // Update existing
-      setProjects((prev) =>
-        prev.map((p) => (p.id === currentProject.id ? { ...p, ...formData, updated_at: new Date().toISOString() } : p))
+    setIsSaving(true);
+    try {
+      const url = currentProject
+        ? `/api/admin/projects/${currentProject.id}`
+        : '/api/admin/projects';
+      const method = currentProject ? 'PATCH' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || 'Save failed. Please try again.');
+      }
+
+      setFormSuccess(
+        currentProject
+          ? `Updated "${formData.name}" successfully.`
+          : `Created project "${formData.name}" successfully.`
       );
-      setFormSuccess(`Updated "${formData.name}" successfully.`);
-    } else {
-      // Create new
-      const newProj: Project = {
-        id: `proj-${Date.now()}`,
-        ...formData,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      setProjects((prev) => [newProj, ...prev]);
-      setFormSuccess(`Created project "${formData.name}" successfully.`);
+      setIsEditing(false);
+      await refreshProjects();
+      setTimeout(() => setFormSuccess(null), 4000);
+    } catch (e: any) {
+      setFormError(e.message || 'Something went wrong saving this project.');
+    } finally {
+      setIsSaving(false);
     }
-
-    setIsEditing(false);
-    setTimeout(() => setFormSuccess(null), 4000);
   };
 
-  const handleTogglePublish = (project: Project) => {
-    const nextStatus: ProjectStatus = project.status === 'published' ? 'draft' : 'published';
-    setProjects((prev) =>
-      prev.map((p) => (p.id === project.id ? { ...p, status: nextStatus, updated_at: new Date().toISOString() } : p))
-    );
+  const handleTogglePublish = async (project: Project) => {
+    try {
+      const res = await fetch(`/api/admin/projects/${project.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'toggle_publish', currentStatus: project.status }),
+      });
+      if (!res.ok) throw new Error('Failed to update publish status.');
+      await refreshProjects();
+    } catch (e: any) {
+      setLoadError(e.message);
+    }
   };
 
-  const handleArchive = (projectId: string) => {
-    if (confirm('Are you sure you want to archive this project?')) {
-      setProjects((prev) =>
-        prev.map((p) => (p.id === projectId ? { ...p, status: 'archived', updated_at: new Date().toISOString() } : p))
-      );
+  const handleArchive = async (projectId: string) => {
+    if (!confirm('Are you sure you want to archive this project?')) return;
+    try {
+      const res = await fetch(`/api/admin/projects/${projectId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'archive' }),
+      });
+      if (!res.ok) throw new Error('Failed to archive project.');
+      await refreshProjects();
+    } catch (e: any) {
+      setLoadError(e.message);
     }
   };
 
@@ -214,13 +258,13 @@ export default function AdminDashboardPage() {
             <span>Preview Site</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
-          <Link
-            href="/admin/login"
-            className="text-xs text-red-400 hover:text-red-300 inline-flex items-center gap-1 font-bold"
+          <button
+            onClick={() => signOut({ callbackUrl: '/admin/login' })}
+            className="text-xs text-red-400 hover:text-red-300 inline-flex items-center gap-1 font-bold cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
-          </Link>
+          </button>
         </div>
       </header>
 
@@ -231,6 +275,15 @@ export default function AdminDashboardPage() {
           <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold flex items-center justify-between">
             <span>{formSuccess}</span>
             <button onClick={() => setFormSuccess(null)}>
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {loadError && (
+          <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm font-bold flex items-center justify-between">
+            <span>{loadError}</span>
+            <button onClick={() => setLoadError(null)}>
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -316,7 +369,14 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E7EB] text-sm">
-                {filteredProjects.length === 0 ? (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-[#5B6573]">
+                      <Loader2 className="w-5 h-5 animate-spin inline-block mr-2" />
+                      Loading projects...
+                    </td>
+                  </tr>
+                ) : filteredProjects.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-[#5B6573]">
                       No projects found matching your search criteria.
@@ -557,12 +617,16 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="pt-4 border-t border-[#E5E7EB] flex items-center justify-end gap-3">
-              <Button variant="ghost" size="md" onClick={() => setIsEditing(false)}>
+              <Button variant="ghost" size="md" onClick={() => setIsEditing(false)} disabled={isSaving}>
                 Cancel
               </Button>
-              <Button variant="primary" size="md" type="submit" form="project-form">
-                <Save className="w-4 h-4 mr-1.5" />
-                <span>Save Project</span>
+              <Button variant="primary" size="md" type="submit" form="project-form" disabled={isSaving}>
+                {isSaving ? (
+                  <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 mr-1.5" />
+                )}
+                <span>{isSaving ? 'Saving...' : 'Save Project'}</span>
               </Button>
             </div>
           </div>
@@ -570,4 +634,4 @@ export default function AdminDashboardPage() {
       )}
     </div>
   );
-}
+}     
