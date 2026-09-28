@@ -1,7 +1,7 @@
 import { getDerivedProjectStatus, slugify, isValidHttpsUrl } from '../../lib/utils';
 
 // Helper assertion function for simple runner
-function assertEqual(actual: any, expected: any, testName: string) {
+function assertEqual(actual: unknown, expected: unknown, testName: string) {
   if (actual === expected) {
     console.log(`[PASS] ${testName}`);
   } else {

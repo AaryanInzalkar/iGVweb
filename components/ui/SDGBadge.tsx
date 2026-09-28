@@ -5,6 +5,7 @@ export interface SDGBadgeProps {
   sdgNumber: number;
   showTitle?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  sharp?: boolean;
   className?: string;
 }
 
@@ -32,6 +33,7 @@ export const SDGBadge: React.FC<SDGBadgeProps> = ({
   sdgNumber,
   showTitle = true,
   size = 'md',
+  sharp = false,
   className,
 }) => {
   const sdg = SDG_DETAILS[sdgNumber] || {
@@ -48,17 +50,25 @@ export const SDGBadge: React.FC<SDGBadgeProps> = ({
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-md text-white shadow-2xs select-none transition-transform hover:scale-105',
+        'inline-flex items-center text-white select-none transition-transform hover:scale-105',
+        sharp
+          ? 'rounded-none font-bold uppercase tracking-[0.15em]'
+          : 'rounded-md shadow-2xs',
         sizes[size],
         className
       )}
       style={{ backgroundColor: sdg.color }}
       title={`UN Sustainable Development Goal ${sdgNumber}: ${sdg.name}`}
     >
-      <span className="font-extrabold bg-black/20 px-1.5 py-0.5 rounded text-[10px] tracking-wider">
+      <span
+        className={cn(
+          'font-extrabold',
+          sharp ? 'bg-black/25 px-1.5 py-0.5 rounded-none text-[10px] tracking-[0.15em]' : 'bg-black/20 px-1.5 py-0.5 rounded text-[10px] tracking-wider'
+        )}
+      >
         SDG {sdgNumber}
       </span>
-      {showTitle && <span className="truncate">{sdg.name}</span>}
+      {showTitle && <span className={cn('truncate', sharp && 'hidden sm:inline')}>{sdg.name}</span>}
     </span>
   );
 };
