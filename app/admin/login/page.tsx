@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/Button';
 import { ShieldCheck, Lock, Mail, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -18,20 +19,19 @@ export default function AdminLoginPage() {
     setError(null);
     setIsLoading(true);
 
-    // Development / Local Admin Auth Fallback Handler
-    setTimeout(() => {
-      if (email.trim() && password.length >= 6) {
-        // Save session flag for development
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('admin_authenticated', 'true');
-          sessionStorage.setItem('admin_email', email);
-        }
-        router.push('/admin');
-      } else {
-        setError('Invalid credentials. Please enter a valid email and password (min 6 characters).');
-        setIsLoading(false);
-      }
-    }, 800);
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError('Invalid email or password. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+
+    router.push('/admin');
   };
 
   return (
@@ -95,13 +95,13 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
-          <Button variant="primary" size="md" isLoading={isLoading} className="w-full">
+          <Button variant="primary" size="md" isLoading={isLoading} className="w-full" type="submit">
             <span>Sign In to Dashboard</span>
           </Button>
         </form>
 
         <div className="pt-4 border-t border-[#E5E7EB] text-center text-[11px] text-[#5B6573]">
-          Secured with Supabase Auth & Role-Based Security Policies.
+          Secured with NextAuth.js & Role-Based Access Control.
         </div>
       </div>
     </div>

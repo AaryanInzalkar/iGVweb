@@ -1,43 +1,34 @@
+import { db } from '@/db';
+import { projects, testimonials } from '@/db/schema';
+import { eq, inArray, asc } from 'drizzle-orm';
 import { Project } from '@/types/project';
 import { Testimonial } from '@/types/testimonial';
 import { MOCK_PROJECTS, MOCK_TESTIMONIALS } from '@/lib/mock-data';
 import { getDerivedProjectStatus } from '@/lib/utils';
-import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
-
-const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl!, supabaseAnonKey!)
-  : null;
+const isDbConfigured = Boolean(process.env.DATABASE_URL);
 
 /**
  * Fetches all published public projects.
- * Excludes draft or archived projects, and automatically calculates derived status for deadlines.
+ * Excludes draft/archived, and calculates derived status for deadlines.
  */
 export async function getPublishedProjects(): Promise<Project[]> {
-  if (isSupabaseConfigured && supabase) {
+  if (isDbConfigured) {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .in('status', ['published', 'closing_soon'])
-        .order('registration_deadline', { ascending: true });
+      const rows = await db
+        .select()
+        .from(projects)
+        .where(inArray(projects.status, ['published', 'closing_soon']))
+        .orderBy(asc(projects.registrationDeadline));
 
-      if (!error && data) {
-        return data.map((p) => ({
-          ...p,
-          status: getDerivedProjectStatus(p.status, p.registration_deadline),
-        }));
+      if (rows.length > 0) {
+        return rows.map((p) => mapDbProjectToProject(p));
       }
     } catch (e) {
-      console.warn('Supabase query failed, falling back to mock dataset', e);
+      console.warn('Neon query failed, falling back to mock dataset', e);
     }
   }
 
-  // Fallback to local development mock data
   return MOCK_PROJECTS.map((p) => ({
     ...p,
     status: getDerivedProjectStatus(p.status, p.registration_deadline),
@@ -48,22 +39,12 @@ export async function getPublishedProjects(): Promise<Project[]> {
  * Fetches a single project by slug.
  */
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
-  if (isSupabaseConfigured && supabase) {
+  if (isDbConfigured) {
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('slug', slug)
-        .single();
-
-      if (!error && data) {
-        return {
-          ...data,
-          status: getDerivedProjectStatus(data.status, data.registration_deadline),
-        };
-      }
+      const [row] = await db.select().from(projects).where(eq(projects.slug, slug));
+      if (row) return mapDbProjectToProject(row);
     } catch (e) {
-      console.warn('Supabase slug query failed, falling back to mock dataset', e);
+      console.warn('Neon slug query failed, falling back to mock dataset', e);
     }
   }
 
@@ -77,24 +58,74 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 }
 
 /**
+ * Fetches ALL projects regardless of status — for admin use only.
+ * Do not call this from public-facing pages.
+ */
+export async function getAllProjectsForAdmin(): Promise<Project[]> {
+  if (isDbConfigured) {
+    try {
+      const rows = await db.select().from(projects).orderBy(asc(projects.registrationDeadline));
+      return rows.map((p) => mapDbProjectToProject(p));
+    } catch (e) {
+      console.warn('Neon admin query failed, falling back to mock dataset', e);
+    }
+  }
+  return MOCK_PROJECTS;
+}
+
+/**
  * Fetches published testimonials.
  */
 export async function getPublishedTestimonials(): Promise<Testimonial[]> {
-  if (isSupabaseConfigured && supabase) {
+  if (isDbConfigured) {
     try {
-      const { data, error } = await supabase
-        .from('testimonials')
-        .select('*')
-        .eq('is_published', true)
-        .order('sort_order', { ascending: true });
-
-      if (!error && data) {
-        return data;
+      const rows = await db
+        .select()
+        .from(testimonials)
+        .where(eq(testimonials.isPublished, true));
+      if (rows.length > 0) {
+        return rows.map((t) => ({
+          id: t.id,
+          volunteer_name: t.volunteerName,
+          country: t.countryOfOrigin ?? '',
+          quote: t.quote,
+          project_id: t.projectId ?? null,
+          image_url: t.photoUrl ?? undefined,
+          is_published: t.isPublished,
+          sort_order: t.sortOrder ?? 0,
+          created_at: t.createdAt?.toISOString(),
+        }));
       }
     } catch (e) {
-      console.warn('Supabase testimonials query failed, falling back to mock dataset', e);
+      console.warn('Neon testimonials query failed, falling back to mock dataset', e);
     }
   }
 
   return MOCK_TESTIMONIALS.filter((t) => t.is_published);
+}
+
+// Maps Drizzle's camelCase row shape back to the app's existing snake_case Project type,
+// so every component that already expects `project.start_date` etc. keeps working unchanged.
+function mapDbProjectToProject(p: typeof projects.$inferSelect): Project {
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    description: p.description,
+    sdg_numbers: p.sdgNumbers,
+    impact_text: p.impactText ?? '',
+    local_committee: p.localCommittee,
+    host_organization: p.hostOrganization,
+    location: p.location,
+    start_date: p.startDate,
+    end_date: p.endDate,
+    registration_deadline: p.registrationDeadline,
+    application_url: p.applicationUrl,
+    image_url: p.imageUrl ?? undefined,
+    image_alt_text: p.imageAltText ?? undefined,
+    status: getDerivedProjectStatus(p.status, p.registrationDeadline),
+    published_at: p.publishedAt?.toISOString() ?? null,
+    created_at: p.createdAt.toISOString(),
+    updated_at: p.updatedAt.toISOString(),
+  };
 }
