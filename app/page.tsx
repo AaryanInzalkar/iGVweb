@@ -2,6 +2,7 @@ import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HeroSection } from '@/components/sections/HeroSection';
+import { FeaturedProjectsStrip } from '@/components/sections/FeaturedProjectsStrip';
 import { WhyBhopalSection } from '@/components/sections/WhyBhopalSection';
 import { ExperiencePillarsSection } from '@/components/sections/ExperiencePillarsSection';
 import { SDGImpactSection } from '@/components/sections/SDGImpactSection';
@@ -19,17 +20,27 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#071B2F]">
+    <div className="flex min-h-screen flex-col bg-[#F9F8F6] text-[#0B0C10]">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:bg-white focus:px-5 focus:py-3 focus:text-[10px] focus:font-bold focus:uppercase focus:tracking-[0.2em] focus:text-black"
+      >
+        Skip to content
+      </a>
+
       <Header />
-      <main className="flex-grow">
+
+      <main id="main" className="flex-grow">
         <HeroSection />
+        <FeaturedProjectsStrip projects={projects} />
         <WhyBhopalSection />
         <ExperiencePillarsSection />
         <SDGImpactSection />
-        <TestimonialsSection testimonials={testimonials} />
         <ProjectGrid projects={projects} />
+        <TestimonialsSection testimonials={testimonials} />
         <FAQSection />
       </main>
+
       <Footer />
     </div>
   );

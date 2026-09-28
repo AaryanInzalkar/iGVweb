@@ -9,12 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
+    "gsap": "^3.15.0",
     "@neondatabase/serverless": "^0.10.0",
     "@vercel/blob": "^0.27.0",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.36.0",
     "lucide-react": "^1.48.0",
+    "motion": "^13.4.4",
     "next": "16.3.6",
+    "ogl": "^1.0.11",
     "next-auth": "^4.24.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"

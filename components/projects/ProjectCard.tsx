@@ -5,128 +5,127 @@ import Link from 'next/link';
 import { Project } from '@/types/project';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { SDGBadge } from '@/components/ui/SDGBadge';
-import { Button } from '@/components/ui/Button';
+import { ApplyLink } from '@/components/ui/ApplyLink';
 import { formatDate } from '@/lib/utils';
-import { Calendar, MapPin, Building2, ArrowUpRight, ArrowRight, AlertCircle } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, MapPin } from 'lucide-react';
 
 interface ProjectCardProps {
   project: Project;
+  index?: number;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const isClosed = project.status === 'closed';
-
-  const handleApplyClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'project_apply_click', {
-        project_id: project.id,
-        source: 'project_card',
-      });
-    }
-  };
+export const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
+  const isClosed = project.status === 'closed' || project.status === 'archived';
 
   return (
-    <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:-translate-y-1.5">
-      <div>
-        {/* Project Image Header */}
-        <div className="relative h-52 w-full overflow-hidden bg-[#0B0C10]">
-          {project.image_url ? (
-            <img
-              src={project.image_url}
-              alt={project.image_alt_text || project.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm font-bold">
-              AIESEC in Bhopal
-            </div>
-          )}
-
-          {/* Status badge positioning */}
-          <div className="absolute top-4 left-4 z-10">
-            <StatusBadge status={project.status} />
+    <article className="group flex flex-col bg-white border border-[#0B0C10]/12 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.35)]">
+      {/* Image Panel */}
+      <div className="relative h-56 w-full overflow-hidden bg-[#0B0C10]">
+        {project.image_url ? (
+          <img
+            src={project.image_url}
+            alt={project.image_alt_text || project.name}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover grayscale-[35%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[#F9F8F6]/40 text-[10px] font-bold uppercase tracking-[0.2em]">
+            AIESEC in Bhopal
           </div>
+        )}
 
-          {/* SDG badges positioning */}
-          <div className="absolute bottom-4 right-4 z-10 flex flex-wrap gap-1 justify-end">
+        <div className="absolute inset-0 bg-[#0B0C10]/25" aria-hidden="true" />
+
+        <div className="absolute top-0 left-0">
+          <StatusBadge status={project.status} showIcon={false} sharp />
+        </div>
+
+        {typeof index === 'number' && (
+          <div className="absolute top-0 right-0 bg-[#0B0C10]/80 text-[#F9F8F6] text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-2">
+            {String(index + 1).padStart(2, '0')}
+          </div>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between gap-3 p-4">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#F9F8F6]/70 inline-flex items-center gap-1.5">
+            <MapPin className="w-3 h-3" />
+            {project.location}
+          </span>
+          <div className="flex flex-wrap gap-1 justify-end">
             {project.sdg_numbers.map((sdgNum) => (
-              <SDGBadge key={sdgNum} sdgNumber={sdgNum} showTitle={false} size="sm" />
+              <SDGBadge key={sdgNum} sdgNumber={sdgNum} showTitle={false} size="sm" sharp />
             ))}
           </div>
         </div>
+      </div>
 
-        {/* Project Card Content */}
-        <div className="p-7 space-y-4">
-          <div className="space-y-1">
-            <h3 className="text-2xl font-black text-[#0B0C10] group-hover:text-[#037EF3] transition-colors leading-tight tracking-tight">
-              <Link href={`/projects/${project.slug}`}>{project.name}</Link>
-            </h3>
-            <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
-              <Building2 className="w-3.5 h-3.5 text-[#037EF3] shrink-0" />
-              <span className="font-bold text-[#0B0C10]">{project.host_organization}</span>
-              <span>•</span>
-              <span>{project.local_committee}</span>
-            </div>
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-7">
+        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B0C10]/40 mb-3">
+          {project.host_organization}
+        </div>
+
+        <h3 className="text-2xl font-black uppercase tracking-tight leading-[1.05] mb-3">
+          <Link href={`/projects/${project.slug}`} className="focus-visible:outline-none">
+            <span className="relative after:absolute after:-bottom-1 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-out group-hover:after:scale-x-100">
+              {project.name}
+            </span>
+          </Link>
+        </h3>
+
+        <p className="text-sm text-[#0B0C10]/55 line-clamp-3 leading-relaxed">{project.description}</p>
+
+        {/* Meta Ledger */}
+        <div className="mt-6 border-t border-[#0B0C10]/12 text-xs">
+          <div className="flex items-center justify-between gap-3 py-3">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B0C10]/40">
+              Realization
+            </span>
+            <span className="font-bold text-right">
+              {formatDate(project.start_date)} — {formatDate(project.end_date)}
+            </span>
           </div>
-
-          <p className="text-sm text-[#6B7280] line-clamp-3 leading-relaxed">
-            {project.description}
-          </p>
-
-          {/* Dates Metadata Box */}
-          <div className="bg-[#F9F8F6] rounded-2xl p-4 space-y-2.5 text-xs text-[#0B0C10] border border-[#E5E7EB]/60">
-            <div className="flex items-center justify-between">
-              <span className="text-[#6B7280] flex items-center gap-1.5 font-medium">
-                <Calendar className="w-3.5 h-3.5 text-[#037EF3]" />
-                Realization Dates:
-              </span>
-              <span className="font-extrabold">
-                {formatDate(project.start_date)} - {formatDate(project.end_date)}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-2">
-              <span className="text-[#6B7280] flex items-center gap-1.5 font-medium">
-                <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                Reg. Deadline:
-              </span>
-              <span className={`font-extrabold ${isClosed ? 'text-red-600 line-through' : 'text-[#0B0C10]'}`}>
-                {formatDate(project.registration_deadline)}
-              </span>
-            </div>
+          <div className="flex items-center justify-between gap-3 py-3 border-t border-[#0B0C10]/12">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B0C10]/40">
+              Deadline
+            </span>
+            <span
+              className={`font-bold text-right ${isClosed ? 'text-[#0B0C10]/30 line-through' : 'text-[#037EF3]'}`}
+            >
+              {formatDate(project.registration_deadline)}
+            </span>
           </div>
         </div>
-      </div>
 
-      {/* Card Action Footer */}
-      <div className="p-7 pt-0 flex items-center justify-between gap-3 border-t border-transparent pt-4">
-        <Link
-          href={`/projects/${project.slug}`}
-          className="text-xs font-black uppercase tracking-wider text-[#037EF3] hover:underline inline-flex items-center gap-1 focus-visible:outline-none"
-        >
-          <span>View Details</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
-
-        {isClosed ? (
-          <Button variant="ghost" size="sm" disabled className="text-xs bg-slate-100 text-slate-400">
-            Closed
-          </Button>
-        ) : (
-          <a
-            href={project.application_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={handleApplyClick}
+        {/* Actions */}
+        <div className="mt-auto pt-7 flex items-center justify-between gap-3">
+          <Link
+            href={`/projects/${project.slug}`}
+            className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B0C10] inline-flex items-center gap-1.5 hover:text-[#037EF3] transition-colors focus-visible:outline-none"
           >
-            <Button variant="pill" size="sm" className="text-xs bg-[#0B0C10] text-white hover:bg-[#037EF3]">
-              <span>Apply Now</span>
-              <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
-            </Button>
-          </a>
-        )}
+            <span>View details</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+
+          {isClosed ? (
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B0C10]/30 px-5 py-3 border border-[#0B0C10]/15">
+              Closed
+            </span>
+          ) : (
+            <ApplyLink
+              href={project.application_url}
+              source="project_card"
+              eventName="project_apply_click"
+              params={{ project_id: project.id }}
+              className="text-[10px] font-bold uppercase tracking-[0.2em] bg-[#0B0C10] text-[#F9F8F6] px-5 py-3 inline-flex items-center gap-1.5 hover:bg-[#037EF3] transition-colors min-h-[44px] focus-visible:outline-none"
+            >
+              <span>Apply now</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </ApplyLink>
+          )}
+        </div>
       </div>
-    </div>
+    </article>
   );
 };

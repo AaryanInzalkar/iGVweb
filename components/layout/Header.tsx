@@ -1,132 +1,119 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, ChevronDown, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import PillNav, { type PillNavItem } from '@/components/layout/PillNav';
+import { MobileDock } from '@/components/layout/MobileDock';
+import { ApplyLink } from '@/components/ui/ApplyLink';
 import { SITE_METADATA } from '@/lib/constants';
 
+const navItems: PillNavItem[] = [
+  { label: 'Projects', href: '#projects' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Why Bhopal', href: '#why-bhopal' },
+  { label: 'Impact & SDGs', href: '#impact' },
+  { label: 'FAQ', href: '#faq' },
+];
+
+const ctaClasses =
+  'pointer-events-auto group items-center justify-center gap-1.5 rounded-full bg-[#F9F8F6] text-[#0B0C10] transition-colors duration-200 hover:bg-white';
+
 export const Header: React.FC = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeHref, setActiveHref] = useState<string | undefined>(undefined);
 
+  /* Scroll-spy so the pill tracks the section in view */
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const sections = navItems
+      .map((item) => document.querySelector<HTMLElement>(item.href))
+      .filter((section): section is HTMLElement => section !== null);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (sections.length === 0) return;
+
+    const visible = new Set<string>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            visible.add(`#${entry.target.id}`);
+          } else {
+            visible.delete(`#${entry.target.id}`);
+          }
+        }
+
+        if (visible.size === 0) {
+          if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 8) {
+            setActiveHref(`#${sections[sections.length - 1].id}`);
+          }
+          return;
+        }
+
+        const current = navItems.find((item) => visible.has(item.href));
+        if (current) setActiveHref(current.href);
+      },
+      { rootMargin: '-25% 0px -60% 0px', threshold: 0 }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
   }, []);
 
-  const navLinks = [
-    { name: 'PROJECTS', href: '#projects', hasDropdown: true },
-    { name: 'EXPERIENCE', href: '#experience', hasDropdown: true },
-    { name: 'WHY BHOPAL', href: '#why-bhopal', hasDropdown: true },
-    { name: 'IMPACT & SDGS', href: '#impact', hasDropdown: false },
-    { name: 'FAQ', href: '#faq', hasDropdown: false },
-  ];
-
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
-        isScrolled
-          ? 'bg-black/90 backdrop-blur-md border-b border-white/10 py-4'
-          : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-5'
-      }`}
-    >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between">
-        {/* Brand Logo - Squarespace Minimalist Style */}
-        <Link
-          href="/"
-          className="flex items-center gap-3 group focus-visible:outline-none"
-        >
-          {/* Geometric Monogram Icon */}
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-white transition-transform group-hover:scale-110" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#037EF3] transition-transform group-hover:scale-110" />
-          </div>
-          <span className="font-extrabold text-base tracking-widest text-white uppercase select-none">
-            AIESEC <span className="font-light text-neutral-300">IN BHOPAL</span>
+    <header className="fixed inset-x-0 top-0 z-50">
+      <PillNav
+        logo="/images/aiesec-bhopal-mark.svg"
+        logoAlt="AIESEC in Bhopal"
+        logoHref="/"
+        items={navItems}
+        activeHref={activeHref}
+        ease="power2.easeOut"
+        baseColor="#0B0C10"
+        pillColor="#F9F8F6"
+        hoveredPillTextColor="#F9F8F6"
+        pillTextColor="#0B0C10"
+        initialLoadAnimation={false}
+        wordmark={
+          <span className="hidden items-center text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#F9F8F6] sm:inline-flex">
+            AIESEC<span className="font-light text-[#F9F8F6]/70">in Bhopal</span>
           </span>
+        }
+      />
+
+      {/* Sits beside the pill bar; icon-only below lg where the dock handles sections */}
+      <div className="pointer-events-none absolute right-4 top-4 z-10 flex items-center gap-4 lg:right-5 lg:top-5">
+        <Link
+          href="/admin/login"
+          className="pointer-events-auto hidden pr-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#F9F8F6]/70 transition-colors hover:text-[#F9F8F6] xl:inline-block"
+        >
+          Log in
         </Link>
 
-        {/* Desktop Navigation - Squarespace Editorial Links */}
-        <nav className="hidden lg:flex items-center gap-8" aria-label="Main Navigation">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-200 hover:text-white transition-colors focus-visible:outline-none"
-            >
-              <span>{link.name}</span>
-              {link.hasDropdown && (
-                <ChevronDown className="w-3 h-3 text-neutral-400 group-hover:text-white transition-transform" />
-              )}
-            </a>
-          ))}
-        </nav>
+        <ApplyLink
+          href={SITE_METADATA.defaultApplyUrl}
+          source="header"
+          eventName="hero_apply_click"
+          className={`${ctaClasses} hidden min-h-[44px] px-5 text-[10px] font-bold uppercase tracking-[0.16em] lg:inline-flex`}
+          aria-label="Get started — apply on the AIESEC Opportunity Portal"
+        >
+          <span>Get started</span>
+          <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </ApplyLink>
 
-        {/* Right Action Group */}
-        <div className="flex items-center gap-6">
-          <Link
-            href="/admin/login"
-            className="hidden sm:inline-block text-[11px] font-bold uppercase tracking-[0.16em] text-neutral-200 hover:text-white transition-colors"
-          >
-            LOG IN
-          </Link>
-
-          <a
-            href={SITE_METADATA.defaultApplyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              if (typeof window !== 'undefined' && (window as any).gtag) {
-                (window as any).gtag('event', 'hero_apply_click', { source: 'header' });
-              }
-            }}
-          >
-            {/* Crisp white solid rectangular button exactly like Squarespace GET STARTED */}
-            <button className="bg-white hover:bg-neutral-200 text-black text-[11px] font-bold uppercase tracking-[0.16em] px-6 py-2.5 rounded-none transition-all duration-200 shadow-md">
-              GET STARTED
-            </button>
-          </a>
-
-          {/* Hamburger toggle */}
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-white hover:text-neutral-300 cursor-pointer focus-visible:outline-none"
-            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+        <ApplyLink
+          href={SITE_METADATA.defaultApplyUrl}
+          source="header"
+          eventName="hero_apply_click"
+          className={`${ctaClasses} inline-flex size-11 lg:hidden`}
+          aria-label="Get started — apply on the AIESEC Opportunity Portal"
+        >
+          <ArrowUpRight className="h-4 w-4" />
+        </ApplyLink>
       </div>
 
-      {/* Mobile Drawer */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-black/95 border-b border-white/10 px-6 py-6 text-white space-y-4">
-          <nav className="flex flex-col gap-3" aria-label="Mobile Navigation">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-xs font-bold uppercase tracking-[0.16em] text-neutral-300 hover:text-white py-2 border-b border-white/10"
-              >
-                {link.name}
-              </a>
-            ))}
-            <Link
-              href="/admin/login"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-xs font-bold uppercase tracking-[0.16em] text-neutral-300 hover:text-white py-2"
-            >
-              LOG IN
-            </Link>
-          </nav>
-        </div>
-      )}
+      {/* Sections live in the dock below lg; the pill bar above owns the brand + apply */}
+      <MobileDock activeHref={activeHref} />
     </header>
   );
 };
