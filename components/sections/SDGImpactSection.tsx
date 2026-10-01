@@ -1,14 +1,25 @@
+'use client';
+
 import React from 'react';
 import { SDGBadge } from '@/components/ui/SDGBadge';
 import { Award, Users, Target, BookOpen } from 'lucide-react';
+import { useParallax } from '@/lib/hooks/useParallax';
 
 export const SDGImpactSection: React.FC = () => {
   const primarySDGs = [3, 4, 6, 13, 15];
+  const parallaxRef = useParallax<HTMLDivElement>(0.5);
 
   return (
-    <section id="impact" className="py-20 md:py-28 bg-[#071B2F] text-white relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#037EF3]/10 rounded-full blur-3xl pointer-events-none" />
+    <section id="impact" className="py-20 md:py-28 text-white relative overflow-hidden">
+      {/* [TEMP_PLACEHOLDER] Background photo — replace with a real community/impact image from Bhopal */}
+      <div
+        ref={parallaxRef}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-125 opacity-50 pointer-events-none"
+       style={{
+         backgroundImage: "url('/images/bhopal/hero-overlook-sunset.jpg')",
+      }}
+      />
+      <div className="absolute inset-0 bg-[#071B2F]/90 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">

@@ -4,8 +4,11 @@ import React from 'react';
 import { AccordionItem } from '@/components/ui/Accordion';
 import { SITE_METADATA } from '@/lib/constants';
 import { HelpCircle, Mail } from 'lucide-react';
+import { useParallax } from '@/lib/hooks/useParallax';
 
 export const FAQSection: React.FC = () => {
+  const parallaxRef = useParallax<HTMLDivElement>(0.5);
+
   const faqs = [
     {
       id: 'faq-1',
@@ -45,8 +48,19 @@ export const FAQSection: React.FC = () => {
   ];
 
   return (
-    <section id="faq" className="py-20 md:py-28 bg-[#F7F5F0] text-[#071B2F]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="faq" className="relative py-20 md:py-28 text-[#071B2F] overflow-hidden">
+      {/* [TEMP_PLACEHOLDER] Background photo — replace with a real AIESEC/Bhopal photo */}
+      <div
+        ref={parallaxRef}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-125 opacity-20 pointer-events-none"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1600')",
+        }}
+      />
+      <div className="absolute inset-0 bg-[#F7F5F0]/85 pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center space-y-4 mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#037EF3]">
             <HelpCircle className="w-3.5 h-3.5" />

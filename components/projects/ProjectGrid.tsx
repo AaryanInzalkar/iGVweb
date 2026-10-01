@@ -13,13 +13,13 @@ export const ProjectGrid: React.FC<ProjectGridProps> = ({ projects }) => {
     <section id="projects" className="py-20 md:py-28 bg-white text-[#071B2F]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#037EF3]">
+                    <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#037EF3]">
             <Sparkles className="w-3.5 h-3.5 text-[#FFC857]" />
-            <span>Opportunities in Bhopal</span>
+            <span>Currently Open</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-[#071B2F]">
-            Current Open <span className="text-[#037EF3]">Volunteer Projects</span>
+            Volunteer <span className="text-[#037EF3]">Projects</span>
           </h2>
 
           <p className="text-base sm:text-lg text-[#5B6573]">

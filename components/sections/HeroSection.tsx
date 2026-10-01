@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { SITE_METADATA } from '@/lib/constants';
+import { useParallax } from '@/lib/hooks/useParallax';
 
 interface CardData {
   id: string;
@@ -139,6 +140,7 @@ export const HeroSection: React.FC = () => {
   const dragState = useRef<{ startX: number; pointerId: number; lastX: number } | null>(null);
   const wheelSettleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wheelActive = useRef(false);
+  const parallaxRef = useParallax<HTMLDivElement>(0.5);
 
   const handleApplyClick = () => {
     if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -253,17 +255,18 @@ export const HeroSection: React.FC = () => {
   return (
     <section className="relative min-h-screen bg-[#080808] text-white flex flex-col justify-between overflow-hidden">
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-85"
-        style={{ backgroundImage: "url('/images/squarespace_hero_bg.jpg')" }}
+        ref={parallaxRef}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-85 scale-125"
+        style={{ backgroundImage: "url('/images/bhopal/hero-overlook-sunset.jpg')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/90 pointer-events-none" />
       <div className="absolute inset-0 bg-radial from-transparent via-black/30 to-black/80 pointer-events-none" />
 
       <div className="relative z-10 pt-28 sm:pt-36 md:pt-40 pb-8 sm:pb-10 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[6.75rem] xl:text-[7.5rem] font-medium tracking-tight text-white leading-[1.03] select-none">
-          AIESEC in Bhopal
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[6.75rem] xl:text-[7.5rem] font-light tracking-tight text-white/90 leading-[1.03] select-none backdrop-blur-[2px]">
+          WELCOME TO
           <br />
-          makes it real
+          <span className="font-black text-white">BHOPAL</span>
         </h1>
         <div className="mt-8 sm:mt-10 flex flex-col items-center gap-3">
           <a

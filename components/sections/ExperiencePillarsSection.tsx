@@ -1,7 +1,12 @@
+'use client';
+
 import React from 'react';
 import { Globe2, Target, Zap } from 'lucide-react';
+import { useParallax } from '@/lib/hooks/useParallax';
 
 export const ExperiencePillarsSection: React.FC = () => {
+  const parallaxRef = useParallax<HTMLDivElement>(0.5);
+
   const pillars = [
     {
       icon: Globe2,
@@ -30,8 +35,17 @@ export const ExperiencePillarsSection: React.FC = () => {
   ];
 
   return (
-    <section id="experience" className="py-20 md:py-28 bg-white text-[#071B2F]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="experience" className="relative py-20 md:py-28 text-[#071B2F] overflow-hidden">
+      <div
+        ref={parallaxRef}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-125 opacity-45 pointer-events-none"
+        style={{
+        backgroundImage: "url('/images/bhopal/lake-boats-dusk.jpg')",
+       }}
+      />
+      <div className="absolute inset-0 bg-white/55 pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#037EF3]">
             <span>The Global Volunteer Journey</span>
