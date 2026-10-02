@@ -44,6 +44,7 @@ const smoothstep = (min, max, value) => {
  * @param {'cover' | 'contain' | 'fill' | 'none' | 'scale-down'} [props.imageFit]
  * @param {number} [props.grayscale]
  * @param {string} [props.className]
+ * @param {(item: SpiralItem, index: number) => void} [props.onItemClick]
  */
 const InfiniteSpiral = ({
   items = [],
@@ -65,7 +66,8 @@ const InfiniteSpiral = ({
   pauseOnHover = true,
   imageFit = 'cover',
   grayscale = 0,
-  className = ''
+  className = '',
+  onItemClick
 }) => {
   const rootRef = useRef(null);
   const cardRefs = useRef([]);
@@ -245,14 +247,24 @@ const InfiniteSpiral = ({
         dragMovedRef.current = false;
         lastPointerYRef.current = event.clientY;
         targetProgressRef.current = progressRef.current;
-        event.currentTarget.setPointerCapture(event.pointerId);
+        // Don't capture the pointer here: setPointerCapture retargets the
+        // follow-up click event to this root element, which would swallow
+        // card clicks. Capture only kicks in once a real drag starts (below).
         event.currentTarget.style.cursor = 'grabbing';
       }}
       onPointerMove={event => {
         if (!draggingRef.current) return;
         const pointerDelta = event.clientY - lastPointerYRef.current;
         lastPointerYRef.current = event.clientY;
-        if (Math.abs(pointerDelta) > 0.5) dragMovedRef.current = true;
+        if (Math.abs(pointerDelta) > 0.5 && !dragMovedRef.current) {
+          dragMovedRef.current = true;
+          // A drag is actually happening — now capture so moves outside the
+          // element keep tracking. Safe to call inside an active pointer event.
+          if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }
+        }
+        if (!dragMovedRef.current) return;
         targetProgressRef.current -= pointerDelta / Math.max(verticalSpacing, 1);
       }}
       onPointerUp={stopDragging}
@@ -274,7 +286,13 @@ const InfiniteSpiral = ({
                 cardRefs.current[index] = node;
               }}
               className="infinite-spiral__item"
-              style={{ width: cardWidth, height: cardHeight, borderRadius: cardRadius }}
+              style={{
+                width: cardWidth,
+                height: cardHeight,
+                borderRadius: cardRadius,
+                cursor: onItemClick ? 'pointer' : undefined
+              }}
+              onClick={onItemClick ? () => onItemClick(item, index) : undefined}
               href={item.href}
               target={item.target}
               rel={item.target === '_blank' ? 'noreferrer' : undefined}

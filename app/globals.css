@@ -85,6 +85,31 @@ body {
 .hero-reveal-delay-3 { animation-delay: 0.8s; }
 .hero-reveal-delay-4 { animation-delay: 1.1s; }
 
+/* Modal entrance */
+.modal-reveal {
+  animation: modalReveal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-backdrop-reveal {
+  animation: modalBackdropReveal 0.25s ease-out forwards;
+}
+
+@keyframes modalBackdropReveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* Glassmorphism */
 .glass-panel-dark {
   background: rgba(11, 12, 16, 0.75);
