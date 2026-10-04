@@ -183,7 +183,7 @@ The homepage hero (`components/sections/HeroSection.tsx`) displays an auto-rotat
 
 The public homepage leans on three custom motion pieces (all client components, all reduced-motion aware):
 
-- **Parallax section backgrounds** — `lib/hooks/useParallax.ts` translates full-bleed Bhopal photography (`public/images/bhopal/`) at a fraction of the scroll speed behind several sections.
+- **Parallax section backgrounds** — `lib/hooks/useParallax.ts` drifts full-bleed Bhopal photography (`public/images/bhopal/`) against the scroll behind several sections. Translation is driven by the section's progress through the viewport and clamped inside the `scale(1.25)` bleed, so backgrounds always cover edge-to-edge — no seams between sections.
 - **Testimonials opener** — `components/ui/ScrollExpand.jsx` (adapted from [React Bits](https://reactbits.dev/), JS + CSS variant): the Testimonials section is a single full-screen frame. When it scrolls into view, a framed lake photo drops in with a soft bounce and expands to fill the frame on a timer (`autoPlay` mode — no scroll hijacking); when the animation completes, the testimonials panel (spiral + copy) rises from the bottom of the same frame to take over — no page scrolling required.
 - **Volunteer spiral** — `components/ui/InfiniteSpiral.jsx`: a 3D rotating spiral of volunteer cards (auto-rotate + scroll + drag, pause on hover). Clicking a card opens `components/sections/TestimonialModal.tsx` — a side-by-side photo/quote dialog (portalled to `<body>`, Escape/backdrop close, photos shown uncropped over a blurred fill).
 
