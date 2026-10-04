@@ -31,9 +31,7 @@ app/
 ├── projects/[slug]/                 # Individual project detail pages
 ├── admin/                          # Admin CMS
 │   ├── login/                      # Admin login (NextAuth credentials sign-in)
-│   ├── page.tsx                    # Dashboard: project CRUD, publish/archive
-│   ├── testimonials/                # (not yet wired to real data)
-│   └── content/                    # (not yet wired to real data)
+│   └── page.tsx                    # Dashboard: project CRUD, publish/archive
 ├── api/
 │   ├── auth/[...nextauth]/          # NextAuth handler (all /api/auth/* routes)
 │   └── admin/projects/              # Admin project CRUD API (GET/POST/PATCH)
@@ -162,11 +160,8 @@ The admin area lives at `/admin` (login at `/admin/login`).
 - Create, edit, publish/unpublish, and archive projects — all persisted to the database (`POST` / `PATCH /api/admin/projects/[id]`)
 - Every mutation is recorded in `audit_logs`
 
-**Not yet wired to real data (still local-state placeholders):**
-- `/admin/testimonials`
-- `/admin/content`
-
 **Not yet implemented:**
+- `/admin/testimonials` and `/admin/content` pages (routes don't exist yet)
 - Image upload via Vercel Blob (`lib/blob.ts` exists but isn't called from the project form yet — images are currently pasted as URLs only)
 
 ---
@@ -218,8 +213,8 @@ The project is set up for deployment on [Vercel](https://vercel.com/):
 
 ## Known Gaps / Next Steps
 
-- [ ] Wire `/admin/testimonials` to real database CRUD (same pattern as projects)
-- [ ] Wire `/admin/content` to real database CRUD
+- [ ] Build `/admin/testimonials` page with real database CRUD (same pattern as projects)
+- [ ] Build `/admin/content` page with real database CRUD
 - [ ] Connect Vercel Blob upload to the project form (replace paste-a-URL with an actual upload button)
 - [ ] Connect Hero showcase cards to real project data instead of hardcoded samples
 - [ ] Replace all `TEMP_PLACEHOLDER` / `TEMP_MOCK` content with real AIESEC in Bhopal assets
