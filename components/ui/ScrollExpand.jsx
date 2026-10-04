@@ -40,6 +40,8 @@ const easeOutBack = (x, c1 = 1.4) => {
  * @param {number} [props.autoPlayDuration] Auto-play length, seconds.
  * @param {number} [props.autoPlayDelay] Delay after entering view before playing, seconds.
  * @param {boolean} [props.autoPlayDrop] In autoPlay mode, drop the frame in from above before it expands.
+ * @param {number} [props.autoPlayEndHold] Pause at full bleed before onAutoPlayComplete fires, seconds.
+ * @param {() => void} [props.onAutoPlayComplete] Called once after an autoPlay run finishes.
  * @param {import('react').ReactNode} [props.children] Overlay content shown at full bleed.
  * @param {string} [props.className]
  * @param {import('react').CSSProperties} [props.style]
@@ -66,6 +68,8 @@ const ScrollExpand = ({
   autoPlayDuration = 2.2,
   autoPlayDelay = 0.2,
   autoPlayDrop = true,
+  autoPlayEndHold = 0.9,
+  onAutoPlayComplete,
   children,
   className = '',
   style,
@@ -97,7 +101,9 @@ const ScrollExpand = ({
     autoPlay,
     autoPlayDuration,
     autoPlayDelay,
-    autoPlayDrop
+    autoPlayDrop,
+    autoPlayEndHold,
+    onAutoPlayComplete
   };
 
   const applyProgress = useCallback(p => {
@@ -216,10 +222,21 @@ const ScrollExpand = ({
     if (propsRef.current.autoPlay) {
       measure();
       let io = null;
+      let endTimeout = 0;
+
+      const fireComplete = () => {
+        if (typeof propsRef.current.onAutoPlayComplete !== 'function') return;
+        // Give the full-bleed moment a beat to land before handing off
+        endTimeout = window.setTimeout(
+          () => propsRef.current.onAutoPlayComplete(),
+          Math.max(propsRef.current.autoPlayEndHold, 0) * 1000
+        );
+      };
 
       if (!propsRef.current.enabled || reduceMotion) {
         // No animation for reduced motion / disabled — jump straight to full bleed.
         applyProgress(1);
+        fireComplete();
       } else {
         applyProgress(0);
 
@@ -265,7 +282,11 @@ const ScrollExpand = ({
               }
             }
 
-            if (p < 1) raf = requestAnimationFrame(step);
+            if (p < 1) {
+              raf = requestAnimationFrame(step);
+            } else {
+              fireComplete();
+            }
           };
           raf = requestAnimationFrame(step);
         };
@@ -286,6 +307,7 @@ const ScrollExpand = ({
 
       return () => {
         if (raf) cancelAnimationFrame(raf);
+        if (endTimeout) clearTimeout(endTimeout);
         if (io) io.disconnect();
         window.removeEventListener('resize', onAutoResize);
       };

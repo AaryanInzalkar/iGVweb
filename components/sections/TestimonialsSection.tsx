@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Testimonial } from '@/types/testimonial';
 import { useParallax } from '@/lib/hooks/useParallax';
 import InfiniteSpiral from '@/components/ui/InfiniteSpiral';
@@ -16,6 +16,23 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
   // Index into `testimonials`; the spiral preserves item order, so the clicked
   // card index maps straight back to the testimonial it was built from.
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const openerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // When the opener animation finishes, glide down to the testimonials — on
+  // screen this reads as the content sliding up over the opener by itself.
+  // Guarded: if the visitor already scrolled away, never yank them back.
+  const handleOpenerComplete = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const opener = openerRef.current;
+    const content = contentRef.current;
+    if (!opener || !content) return;
+    const rect = opener.getBoundingClientRect();
+    const stillWatching =
+      rect.bottom > window.innerHeight * 0.25 && rect.top < window.innerHeight * 0.75;
+    if (!stillWatching) return;
+    content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   if (!testimonials || testimonials.length === 0) {
     return null;
@@ -39,13 +56,14 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
       {/* Cinematic opener: the framed lake shot expands to full bleed
           automatically as soon as it scrolls into view (time-based, no
           scroll hijacking), then the page continues to the spiral below. */}
-      <div className="bg-[#0B0C10]">
+      <div ref={openerRef} className="bg-[#0B0C10]">
         <ScrollExpand
           src="/images/bhopal/upper-lake-sunset.jpg"
           alt="Sunset over Bhopal's Upper Lake"
           title="Past Experiences"
           autoPlay
           autoPlayDuration={1.5}
+          onAutoPlayComplete={handleOpenerComplete}
           mediaZoom={1.3}
           overlayScrim={0.55}
         >
@@ -57,7 +75,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
               Hear it from the people who lived it.
             </p>
             <p className="text-base sm:text-lg text-white/75">
-              Keep scrolling to meet the volunteers.
+              Taking you to their stories…
             </p>
           </div>
         </ScrollExpand>
@@ -65,7 +83,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
 
       {/* Spiral + context copy. Parallax layers live in this wrapper so the
           opener above stays a clean dark stage. */}
-      <div className="relative py-24 md:py-36 overflow-hidden">
+      <div ref={contentRef} className="relative py-24 md:py-36 overflow-hidden">
         <div
           ref={parallaxRef}
           className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-125 opacity-45 pointer-events-none"
