@@ -42,9 +42,13 @@ app/
 components/
 ├── layout/                         # Header, Footer
 ├── sections/                       # Hero (auto-rotating showcase), Why Bhopal,
-│                                    # Experience Pillars, SDG/Impact, Testimonials, FAQ
+│                                    # Experience Pillars, SDG/Impact, FAQ,
+│                                    # TestimonialsSection + TestimonialModal
 ├── projects/                       # ProjectCard, ProjectGrid
-└── ui/                             # Reusable UI primitives (Button, Badge, StatusBadge, etc.)
+└── ui/                             # Reusable primitives (Button, Badge, ...) plus two
+                                    # gallery components with their own CSS:
+                                    # InfiniteSpiral (3D rotating card spiral) and
+                                    # ScrollExpand (expanding media frame, React Bits)
 
 lib/
 ├── constants.ts                    # Site metadata, brand colors, governance flags
@@ -52,8 +56,11 @@ lib/
 ├── admin-data.ts                   # Admin write layer (create/update/publish/archive + audit log)
 ├── auth.ts                         # NextAuth config (credentials provider, bcrypt check)
 ├── blob.ts                         # Vercel Blob upload helper (not yet wired into UI)
+├── hooks/useParallax.ts            # Scroll-linked background parallax hook
 ├── mock-data.ts                    # Development/placeholder dataset (fallback only)
 └── utils.ts                        # Status/deadline calculation helpers
+
+public/images/bhopal/               # Local photography used for hero/parallax/opener
 
 db/
 ├── schema.ts                       # Drizzle schema — projects, testimonials, site_content,
@@ -166,9 +173,21 @@ The admin area lives at `/admin` (login at `/admin/login`).
 
 ## Hero Showcase Cards
 
-The homepage hero (`components/sections/HeroSection.tsx`) displays an auto-rotating set of project showcase cards (currently 4 sample cards, 3 visible at a time — center card prominent, side cards smaller and faded) that slide continuously every 6 seconds.
+The homepage hero (`components/sections/HeroSection.tsx`) displays an auto-rotating set of project showcase cards (currently 4 sample cards, 3 visible at a time — center card prominent, side cards smaller and faded) that slide continuously every 6 seconds. The carousel also tracks drag/swipe live (pointer events), with continuous scale and fade interpolation while dragging.
 
 ⚠️ These cards are currently **hardcoded sample data**, not pulled from the real `projects` table. Before launch, this should be connected to `getPublishedProjects()` from `lib/data.ts` so the homepage always reflects real, current projects — and so the `[TEMP_MOCK]` governance tagging (see below) actually applies here too.
+
+---
+
+## Homepage Motion Design
+
+The public homepage leans on three custom motion pieces (all client components, all reduced-motion aware):
+
+- **Parallax section backgrounds** — `lib/hooks/useParallax.ts` translates full-bleed Bhopal photography (`public/images/bhopal/`) at a fraction of the scroll speed behind several sections.
+- **Testimonials opener** — `components/ui/ScrollExpand.jsx` (adapted from [React Bits](https://reactbits.dev/), JS + CSS variant): when the Testimonials section scrolls into view, a framed lake photo drops in with a soft bounce and expands to full bleed on a timer (`autoPlay` mode — no scroll hijacking), then the page glides itself down to the gallery (skipped if the visitor already scrolled away).
+- **Volunteer spiral** — `components/ui/InfiniteSpiral.jsx`: a 3D rotating spiral of volunteer cards (auto-rotate + scroll + drag, pause on hover). Clicking a card opens `components/sections/TestimonialModal.tsx` — a side-by-side photo/quote dialog (portalled to `<body>`, Escape/backdrop close, photos shown uncropped over a blurred fill).
+
+Both gallery components are plain `.jsx` + `.css` with JSDoc-typed props so they type-check under strict TypeScript when imported from `.tsx` files.
 
 ---
 
