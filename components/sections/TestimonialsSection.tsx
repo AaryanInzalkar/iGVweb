@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Testimonial } from '@/types/testimonial';
-import { useParallax } from '@/lib/hooks/useParallax';
 import InfiniteSpiral from '@/components/ui/InfiniteSpiral';
 import ScrollExpand from '@/components/ui/ScrollExpand';
 import { TestimonialModal } from './TestimonialModal';
@@ -12,27 +11,12 @@ interface TestimonialsSectionProps {
 }
 
 export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials }) => {
-  const parallaxRef = useParallax<HTMLDivElement>(0.5);
   // Index into `testimonials`; the spiral preserves item order, so the clicked
   // card index maps straight back to the testimonial it was built from.
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const openerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  // When the opener animation finishes, glide down to the testimonials — on
-  // screen this reads as the content sliding up over the opener by itself.
-  // Guarded: if the visitor already scrolled away, never yank them back.
-  const handleOpenerComplete = () => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const opener = openerRef.current;
-    const content = contentRef.current;
-    if (!opener || !content) return;
-    const rect = opener.getBoundingClientRect();
-    const stillWatching =
-      rect.bottom > window.innerHeight * 0.25 && rect.top < window.innerHeight * 0.75;
-    if (!stillWatching) return;
-    content.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  // Flipped when the opener animation finishes — the testimonials panel then
+  // rises from the bottom of the SAME full-screen frame (no page scrolling).
+  const [revealed, setRevealed] = useState(false);
 
   if (!testimonials || testimonials.length === 0) {
     return null;
@@ -52,22 +36,27 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
   }));
 
   return (
-    <section id="testimonials" className="text-[#0B0C10]">
-      {/* Cinematic opener: the framed lake shot expands to full bleed
-          automatically as soon as it scrolls into view (time-based, no
-          scroll hijacking), then the page continues to the spiral below. */}
-      <div ref={openerRef} className="bg-[#0B0C10]">
+    // One-screen stage: the opener plays, then the testimonials panel slides
+    // up over it — the whole experience stays inside this single frame.
+    <section id="testimonials" className="relative h-screen overflow-hidden bg-[#0B0C10] text-[#0B0C10]">
+      {/* Opener: drops in and expands to fill this exact frame */}
+      <div className="absolute inset-0">
         <ScrollExpand
           src="/images/bhopal/upper-lake-sunset.jpg"
           alt="Sunset over Bhopal's Upper Lake"
           title="Past Experiences"
           autoPlay
           autoPlayDuration={1.5}
-          onAutoPlayComplete={handleOpenerComplete}
+          onAutoPlayComplete={() => setRevealed(true)}
           mediaZoom={1.3}
           overlayScrim={0.55}
         >
-          <div className="max-w-3xl space-y-5">
+          {/* Opener copy — fades away as the testimonials panel rises */}
+          <div
+            className={`max-w-3xl space-y-5 transition-opacity duration-700 ${
+              revealed ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
             <div className="text-xs font-bold uppercase tracking-widest text-white/70">
               Social Proof & Stories
             </div>
@@ -81,51 +70,57 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
         </ScrollExpand>
       </div>
 
-      {/* Spiral + context copy. Parallax layers live in this wrapper so the
-          opener above stays a clean dark stage. */}
-      <div ref={contentRef} className="relative py-24 md:py-36 overflow-hidden">
-        <div
-          ref={parallaxRef}
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-125 opacity-45 pointer-events-none"
-          style={{ backgroundImage: "url('/images/bhopal/lake-boats-dusk.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-[#F9F8F6]/55 pointer-events-none" />
+      {/* Testimonials panel: parked just below the frame until the opener
+          completes, then rises over it. Fully transparent — the opener's
+          expanded sunset stays visible as the background. overflow-y-auto is
+          a safety net for very short viewports; reduced-motion users get it
+          instantly. */}
+      <div
+        className={`absolute inset-0 z-20 overflow-y-auto transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          revealed ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
+        <div className="relative flex min-h-full py-16 md:py-20">
+          {/* Directional scrim: the sunset stays visible, but the copy side gets
+              contrast — lightest over the cards, darkest under the text */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/40 to-black/60 pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Rotating volunteer spiral, framed inside a frosted square panel */}
-            <div className="relative mx-auto w-full max-w-[540px] aspect-square rounded-3xl overflow-hidden border border-white/60 bg-white/30 backdrop-blur-sm shadow-[0_24px_70px_rgba(11,12,16,0.14)]">
-              <InfiniteSpiral
-                items={spiralItems}
-                animationMode="all"
-                speed={0.45}
-                radius={200}
-                cardWidth={150}
-                cardHeight={190}
-                verticalSpacing={70}
-                perspective={1100}
-                cardRadius={14}
-                centerScale={1.25}
-                edgeBlur={5}
-                cardsPerTurn={Math.max(spiralItems.length, 6)}
-                pauseOnHover
-                onItemClick={(_item, index) => setActiveIndex(index)}
-              />
-            </div>
+          <div className="relative z-10 m-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+              {/* Rotating volunteer spiral — frameless, floats over the sunset */}
+              <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[380px] lg:max-w-[520px] aspect-square">
+                <InfiniteSpiral
+                  items={spiralItems}
+                  animationMode="all"
+                  speed={0.45}
+                  radius={200}
+                  cardWidth={150}
+                  cardHeight={190}
+                  verticalSpacing={70}
+                  perspective={1100}
+                  cardRadius={14}
+                  centerScale={1.25}
+                  edgeBlur={5}
+                  cardsPerTurn={Math.max(spiralItems.length, 6)}
+                  pauseOnHover
+                  onItemClick={(_item, index) => setActiveIndex(index)}
+                />
+              </div>
 
-            {/* Context copy explaining what the spiral shows */}
-            <div className="space-y-5 text-center lg:text-left max-w-xl mx-auto lg:mx-0">
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-[#0B0C10]">
-                Meet the <span className="text-[#037EF3]">Volunteers</span>
-              </h2>
-              <p className="text-base sm:text-lg text-[#6B7280]">
-                Hear directly from international youth who completed Global Volunteer exchanges in Bhopal.
-              </p>
-              <p className="text-sm sm:text-base text-[#6B7280]/90">
-                Every card in the spiral is a real volunteer — their photo, home country, and the project
-                they joined. Scroll or drag to spin through the stories, hover to pause on a face, and
-                click a card to read their full story.
-              </p>
+              {/* Context copy explaining what the spiral shows */}
+              <div className="space-y-5 text-center lg:text-left max-w-xl mx-auto lg:mx-0">
+                <h2 className="text-5xl sm:text-6xl font-black tracking-tight text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.45)]">
+                  Meet the <span className="text-[#4DA3FF]">Volunteers</span>
+                </h2>
+                <p className="text-lg sm:text-xl text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,0.4)]">
+                  Hear directly from international youth who completed Global Volunteer exchanges in Bhopal.
+                </p>
+                <p className="text-base sm:text-lg text-white/75 [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
+                  Every card in the spiral is a real volunteer — their photo, home country, and the project
+                  they joined. Scroll or drag to spin through the stories, hover to pause on a face, and
+                  click a card to read their full story.
+                </p>
+              </div>
             </div>
           </div>
         </div>

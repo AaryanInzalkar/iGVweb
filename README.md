@@ -184,7 +184,7 @@ The homepage hero (`components/sections/HeroSection.tsx`) displays an auto-rotat
 The public homepage leans on three custom motion pieces (all client components, all reduced-motion aware):
 
 - **Parallax section backgrounds** — `lib/hooks/useParallax.ts` translates full-bleed Bhopal photography (`public/images/bhopal/`) at a fraction of the scroll speed behind several sections.
-- **Testimonials opener** — `components/ui/ScrollExpand.jsx` (adapted from [React Bits](https://reactbits.dev/), JS + CSS variant): when the Testimonials section scrolls into view, a framed lake photo drops in with a soft bounce and expands to full bleed on a timer (`autoPlay` mode — no scroll hijacking), then the page glides itself down to the gallery (skipped if the visitor already scrolled away).
+- **Testimonials opener** — `components/ui/ScrollExpand.jsx` (adapted from [React Bits](https://reactbits.dev/), JS + CSS variant): the Testimonials section is a single full-screen frame. When it scrolls into view, a framed lake photo drops in with a soft bounce and expands to fill the frame on a timer (`autoPlay` mode — no scroll hijacking); when the animation completes, the testimonials panel (spiral + copy) rises from the bottom of the same frame to take over — no page scrolling required.
 - **Volunteer spiral** — `components/ui/InfiniteSpiral.jsx`: a 3D rotating spiral of volunteer cards (auto-rotate + scroll + drag, pause on hover). Clicking a card opens `components/sections/TestimonialModal.tsx` — a side-by-side photo/quote dialog (portalled to `<body>`, Escape/backdrop close, photos shown uncropped over a blurred fill).
 
 Both gallery components are plain `.jsx` + `.css` with JSDoc-typed props so they type-check under strict TypeScript when imported from `.tsx` files.
